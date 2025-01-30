@@ -23,17 +23,63 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "0EB0FC41-6261-4A19-A203-C660FC766BB1"
-            shouldBeEnabled = "No"
+            uuid = "8BDB3948-4F77-4C35-B67E-4F2362ABABF1"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FocusExample/Views/FocusTree.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "18"
-            endingLineNumber = "18"
-            landmarkName = "focusNext(for:nextNode:)"
+            startingLineNumber = "37"
+            endingLineNumber = "37"
+            landmarkName = "dfsFindNextFocusable(condition:_:)"
             landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "8C978780-2AEE-40BB-B68A-44C3F8BDE96C"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FocusExample/Views/FocusTree.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "36"
+            endingLineNumber = "36"
+            landmarkName = "dfsFindNextFocusable(condition:_:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "8C978780-2AEE-40BB-B68A-44C3F8BDE96C - 65f5c338e8974d77"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "FocusExample.FocusTree.dfsFindNextFocusable(condition: (FocusExample.Focusable) -&gt; Swift.Bool, _: FocusExample.Focusable) -&gt; Swift.Optional&lt;FocusExample.Focusable&gt;"
+                  moduleName = "FocusExample.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/yokim/Documents/GitHub/FocusExample/FocusExample/Views/FocusTree.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "36"
+                  endingLineNumber = "36">
+               </Location>
+               <Location
+                  uuid = "8C978780-2AEE-40BB-B68A-44C3F8BDE96C - 65f5c338e8974d77"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "FocusExample.FocusTree.dfsFindNextFocusable(condition: (FocusExample.Focusable) -&gt; Swift.Bool, _: FocusExample.Focusable) -&gt; Swift.Optional&lt;FocusExample.Focusable&gt;"
+                  moduleName = "FocusExample.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/yokim/Documents/GitHub/FocusExample/FocusExample/Views/FocusTree.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "36"
+                  endingLineNumber = "36">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

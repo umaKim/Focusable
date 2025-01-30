@@ -7,40 +7,28 @@
 
 import UIKit
 
-final class ContentView: UIView, NameSectionDelegate, AddressSectionDelegate, Focusable {
+final class ContentView: UIView, NameSectionDelegate, AddressSectionDelegate {
     
-    var focusableTarget: UITextField? = nil
-    
-    var isFocusedField: Bool = false
-    
-    lazy var children: [any Focusable] = [
-        nameSection,
-        addressSection,
-        transactionSection
-    ]
     
     func didTapReturn() -> Bool {
-//        focusTree.dfs(condition: { item in
-////            !(item.focusableTarget?.text?.isEmpty ?? true) &&
-////            !isFocusedField
-//            !item.isFocusedField && item.isFocusableTextEmpty
-//        }) { node in
-//            node?.shouldBecomeResponder
-//        }
-        
-        
-//        focusTree.focusNext { obj in
-//            obj.focusableTarget?.text?.isEmpty ?? false
-//        } nextNode: { obj in
-//            obj?.shouldBecomeResponder
-//        }
-        
-        focusTree.focusNext(for: {
-            !($0.focusableTarget?.hasText ?? true)
-        }) { obj in
-            obj?.shouldBecomeResponder
+        focusWrapper.didTapNext { oldFocusable, newFocusable in
+            // 여기에서 해당 oldFocusable, newFocusable에 first responder처리를 할것인지 말것인지를 처리해줄수 있다.
+            
+            // newFocusable의 위치로 scroll하게도 가능하게 처리 할수 있다.
+            
+            oldFocusable.focusableTarget?.borderStyle = .none
+            newFocusable.focusableTarget?.borderStyle = .roundedRect
+            
+            print("old: \(oldFocusable.focusableTarget?.text)")
+            print("new \(newFocusable.focusableTarget?.text)")
+            print("old: \(oldFocusable.focusableTarget?.bounds)")
+            print("new \(newFocusable.focusableTarget?.bounds)")
+            
+            let frameInWindow1 = oldFocusable.convert(oldFocusable.bounds, to: nil)
+            let frameInWindow2 = newFocusable.convert(newFocusable.bounds, to: nil)
+            print(frameInWindow1)
+            print(frameInWindow2)
         }
-
         return true
     }
     
@@ -48,28 +36,34 @@ final class ContentView: UIView, NameSectionDelegate, AddressSectionDelegate, Fo
     private lazy var addressSection = AddressSection()
     private lazy var transactionSection = TransactionSection()
     
-    let focusTree = FocusTree()
+    let focusWrapper = FocusWrapper2()
     
     init() {
         super.init(frame: .zero)
         setupUI()
-        
-        focusTree.nodes = [self]
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+}
+
+//MARK: - Set up UI
+extension ContentView {
     private func setupUI() {
         nameSection.delegate = self
         addressSection.delegate = self
         transactionSection.delegate = self
-        let sv = UIStackView(arrangedSubviews: [
-            nameSection,
-            addressSection,
-            transactionSection
-        ])
+        let sv = UIStackView(
+            arrangedSubviews:
+                focusWrapper
+                .setNextCondtion(.skipFilledOne)
+                .build {
+                    [nameSection,
+                     addressSection,
+                     transactionSection]
+                }
+        )
         sv.axis = .vertical
         sv.alignment = .fill
         sv.distribution = .fill
@@ -86,4 +80,3 @@ final class ContentView: UIView, NameSectionDelegate, AddressSectionDelegate, Fo
         ])
     }
 }
-

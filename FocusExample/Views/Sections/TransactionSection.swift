@@ -19,9 +19,7 @@ final class TransactionSection: UIView, Focusable, FocusableTextFieldDelegate {
     
     var focusableTarget: UITextField? { nil }
     
-    var isFocusedField: Bool {
-        false
-    }
+    var isFocusedField: Bool = false
     
     func textFieldDidChange(_ textField: UITextField) {
         print(generalAddress.isFocusedField)

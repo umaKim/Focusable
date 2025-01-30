@@ -23,7 +23,21 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		356C34502D339D990067A177 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		356C34542D33A4C90067A177 /* LibraryTypeStudy.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = LibraryTypeStudy.xcodeproj; sourceTree = "<group>"; };
 		35A5A14C2CDFD6A6006F1C5F /* FocusExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		35A5A1622CDFD6A8006F1C5F /* FocusExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		35A5A16C2CDFD6A8006F1C5F /* FocusExampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FocusExampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -85,12 +99,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		356C344D2D339D990067A177 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		356C34552D33A4C90067A177 /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
 		35A5A1432CDFD6A6006F1C5F = {
 			isa = PBXGroup;
 			children = (
+				356C34542D33A4C90067A177 /* LibraryTypeStudy.xcodeproj */,
 				35A5A14E2CDFD6A6006F1C5F /* FocusExample */,
 				35A5A1652CDFD6A8006F1C5F /* FocusExampleTests */,
 				35A5A16F2CDFD6A8006F1C5F /* FocusExampleUITests */,
+				356C344D2D339D990067A177 /* Frameworks */,
 				35A5A14D2CDFD6A6006F1C5F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -115,6 +143,7 @@
 				35A5A1482CDFD6A6006F1C5F /* Sources */,
 				35A5A1492CDFD6A6006F1C5F /* Frameworks */,
 				35A5A14A2CDFD6A6006F1C5F /* Resources */,
+				356C34502D339D990067A177 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -211,6 +240,12 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 35A5A14D2CDFD6A6006F1C5F /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 356C34552D33A4C90067A177 /* Products */;
+					ProjectRef = 356C34542D33A4C90067A177 /* LibraryTypeStudy.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				35A5A14B2CDFD6A6006F1C5F /* FocusExample */,

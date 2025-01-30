@@ -12,16 +12,13 @@ protocol AddressSectionDelegate: AnyObject {
 }
 
 final class AddressSection: UIView, Focusable, FocusableTextFieldDelegate {
+    var isFocusedField: Bool = false
     
     func didTapReturn() -> Bool {
         delegate?.didTapReturn() ?? false
     }
     
     var focusableTarget: UITextField? { nil }
-    
-    var isFocusedField: Bool {
-        false
-    }
     
     func textFieldDidChange(_ textField: UITextField) {
         print(generalAddress.isFocusedField)

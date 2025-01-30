@@ -23,9 +23,7 @@ final class NameSection: UIView,
         delegate?.didTapReturn() ?? false
     }
     
-    var isFocusedField: Bool {
-        false
-    }
+    var isFocusedField: Bool = false
     
     lazy var children: [any Focusable] = [lastName, firstName]
     

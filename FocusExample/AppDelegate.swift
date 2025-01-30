@@ -5,6 +5,7 @@
 //  Created by 김윤석 on 11/10/24.
 //
 
+//import LibraryTypeStudy
 import UIKit
 
 @main

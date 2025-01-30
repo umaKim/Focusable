@@ -13,12 +13,9 @@ protocol FocusableTextFieldDelegate: AnyObject {
 }
 
 final class FocusableTextField: UIView, Focusable {
+    lazy var isFocusedField: Bool = textField.isFirstResponder
     
     var focusableTarget: UITextField? { textField }
-    
-    var isFocusedField: Bool {
-        textField.isFirstResponder
-    }
     
     var children: [any Focusable] = []
     
