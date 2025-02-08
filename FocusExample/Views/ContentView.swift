@@ -7,36 +7,23 @@
 
 import UIKit
 
-final class ContentView: UIView, NameSectionDelegate, AddressSectionDelegate {
+protocol TempProtocol {
+    
+}
+
+final class ContentView: UIView, NameSectionDelegate, AddressSectionDelegate, TempProtocol {
     
     
     func didTapReturn() -> Bool {
-        focusWrapper.didTapNext { oldFocusable, newFocusable in
-            // 여기에서 해당 oldFocusable, newFocusable에 first responder처리를 할것인지 말것인지를 처리해줄수 있다.
-            
-            // newFocusable의 위치로 scroll하게도 가능하게 처리 할수 있다.
-            
-            oldFocusable.focusableTarget?.borderStyle = .none
-            newFocusable.focusableTarget?.borderStyle = .roundedRect
-            
-            print("old: \(oldFocusable.focusableTarget?.text)")
-            print("new \(newFocusable.focusableTarget?.text)")
-            print("old: \(oldFocusable.focusableTarget?.bounds)")
-            print("new \(newFocusable.focusableTarget?.bounds)")
-            
-            let frameInWindow1 = oldFocusable.convert(oldFocusable.bounds, to: nil)
-            let frameInWindow2 = newFocusable.convert(newFocusable.bounds, to: nil)
-            print(frameInWindow1)
-            print(frameInWindow2)
-        }
+        focusWrapper.didTapNext()
         return true
     }
     
     private lazy var nameSection = NameSection()
     private lazy var addressSection = AddressSection()
-    private lazy var transactionSection = TransactionSection()
+    private lazy var transactionSection = TransactionSubView()
     
-    let focusWrapper = FocusWrapper2()
+    let focusWrapper = FocusWrapper()
     
     init() {
         super.init(frame: .zero)
@@ -50,33 +37,44 @@ final class ContentView: UIView, NameSectionDelegate, AddressSectionDelegate {
 
 //MARK: - Set up UI
 extension ContentView {
+//    private func setupUI() {
+//        nameSection.delegate = self
+//        addressSection.delegate = self
+//        transactionSection.delegate = self
+//        
+//        let view = focusWrapper
+////                .setNextCondtion(.skipFilledOne)
+//            .build {
+//                [nameSection,
+//                 addressSection,
+//                 transactionSection]
+//            }
+//        addSubview(view)
+//        view.frame = self.bounds
+//        
+//        
+////        focusWrapper.set(self)
+//    }
+    
     private func setupUI() {
-        nameSection.delegate = self
-        addressSection.delegate = self
-        transactionSection.delegate = self
-        let sv = UIStackView(
-            arrangedSubviews:
-                focusWrapper
-                .setNextCondtion(.skipFilledOne)
-                .build {
-                    [nameSection,
-                     addressSection,
-                     transactionSection]
-                }
-        )
-        sv.axis = .vertical
-        sv.alignment = .fill
-        sv.distribution = .fill
-        sv.spacing = 6
-        
-        [sv].forEach {
-            $0.translatesAutoresizingMaskIntoConstraints = false
-            addSubview($0)
+            nameSection.delegate = self
+            addressSection.delegate = self
+            transactionSection.delegate = self
+            
+            let view = focusWrapper.build {
+                [nameSection,
+                 addressSection,
+                 transactionSection]
+            }
+            
+            addSubview(view)
+            
+            view.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                view.topAnchor.constraint(equalTo: topAnchor),
+                view.leadingAnchor.constraint(equalTo: leadingAnchor),
+                view.trailingAnchor.constraint(equalTo: trailingAnchor),
+                view.bottomAnchor.constraint(equalTo: bottomAnchor)
+            ])
         }
-        
-        NSLayoutConstraint.activate([
-            sv.centerXAnchor.constraint(equalTo: centerXAnchor),
-            sv.centerYAnchor.constraint(equalTo: centerYAnchor),
-        ])
-    }
 }

@@ -11,23 +11,16 @@ protocol AddressSectionDelegate: AnyObject {
     func didTapReturn() -> Bool
 }
 
-final class AddressSection: UIView, Focusable, FocusableTextFieldDelegate {
-    var isFocusedField: Bool = false
-    
+final class AddressSection: UIView, FocusableTextFieldDelegate {
     func didTapReturn() -> Bool {
         delegate?.didTapReturn() ?? false
     }
     
-    var focusableTarget: UITextField? { nil }
-    
     func textFieldDidChange(_ textField: UITextField) {
-        print(generalAddress.isFocusedField)
-        print(detailAddress.isFocusedField)
+        
     }
     
     weak var delegate: AddressSectionDelegate?
-    
-    lazy var children: [any Focusable] = [generalAddress, detailAddress]
    
     private lazy var titleLabel: UILabel = {
         let lb = UILabel()
@@ -38,7 +31,15 @@ final class AddressSection: UIView, Focusable, FocusableTextFieldDelegate {
     }()
     
     lazy var generalAddress: FocusableTextField = {
-       let tf = FocusableTextField()
+        let tf = FocusableTextField(.init(
+            condition: { [weak self] in
+                self?.generalAddress.textField.text?.isEmpty ?? true
+            },
+            focusAction: {
+                print("focusedAction generalAddress")
+                self.generalAddress.textField.becomeFirstResponder()
+            }
+        ))
         tf.delegate = self
         tf.backgroundColor = .orange
         tf.returnKeyType = .next
@@ -46,7 +47,15 @@ final class AddressSection: UIView, Focusable, FocusableTextFieldDelegate {
     }()
     
     lazy var detailAddress: FocusableTextField = {
-       let tf = FocusableTextField()
+       let tf = FocusableTextField(.init(
+        condition: { [weak self] in
+            self?.detailAddress.textField.text?.isEmpty ?? true
+        },
+        focusAction: {
+            print("focusedAction detailAddress")
+            self.detailAddress.textField.becomeFirstResponder()
+        }
+    ))
         tf.delegate = self
         tf.backgroundColor = .blue
         tf.returnKeyType = .next

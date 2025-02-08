@@ -12,14 +12,22 @@ protocol FocusableTextFieldDelegate: AnyObject {
     func didTapReturn() -> Bool
 }
 
-final class FocusableTextField: UIView, Focusable {
-    lazy var isFocusedField: Bool = textField.isFirstResponder
+extension FocusableTextField: Focusable {
+    var focusAction: (() -> Void) {
+        focusSetter?.focusAction ?? { () }
+    }
     
+    var focusableCondition: (() -> Bool) {
+        focusSetter?.condition ?? { false }
+    }
+}
+
+final class FocusableTextField: UIView {
     var focusableTarget: UITextField? { textField }
     
-    var children: [any Focusable] = []
-    
     weak var delegate: FocusableTextFieldDelegate?
+    
+    private var focusSetter: FocusSetter?
     
     var returnKeyType: UIReturnKeyType  {
         get {
@@ -38,7 +46,8 @@ final class FocusableTextField: UIView, Focusable {
         return tf
     }()
     
-    init() {
+    init(_ focusSetter: FocusSetter? = nil) {
+        self.focusSetter = focusSetter
         super.init(frame: .zero)
         setupUI()
     }
@@ -70,6 +79,10 @@ extension FocusableTextField: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         print("textFieldDidBeginEditing")
         print(textField.text)
+        
+        if let focusWrapper = findFocusWrapper(self) {
+            focusWrapper.focusedByUserInteraction(self)
+        }
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
@@ -88,10 +101,3 @@ extension FocusableTextField: UITextFieldDelegate {
         return delegate?.didTapReturn() ?? false
     }
 }
-
-//extension UITextField: Focusable {
-//    var children: [any Focusable] {
-//        
-//        return []
-//    }
-//}

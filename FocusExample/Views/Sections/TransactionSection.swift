@@ -11,25 +11,18 @@ protocol TransactionSectionDelegate: AnyObject {
     func didTapReturn() -> Bool
 }
 
-final class TransactionSection: UIView, Focusable, FocusableTextFieldDelegate {
+final class TransactionSection: UIView, FocusableTextFieldDelegate, AddressSectionDelegate {
     
     func didTapReturn() -> Bool {
         delegate?.didTapReturn() ?? false
     }
     
-    var focusableTarget: UITextField? { nil }
-    
-    var isFocusedField: Bool = false
-    
     func textFieldDidChange(_ textField: UITextField) {
-        print(generalAddress.isFocusedField)
-        print(detailAddress.isFocusedField)
+        
     }
     
     weak var delegate: AddressSectionDelegate?
     
-    lazy var children: [any Focusable] = [generalAddress, detailAddress]
-   
     private lazy var titleLabel: UILabel = {
         let lb = UILabel()
         lb.text = "Transaction"
@@ -39,28 +32,32 @@ final class TransactionSection: UIView, Focusable, FocusableTextFieldDelegate {
     }()
     
     lazy var generalAddress: FocusableTextField = {
-       let tf = FocusableTextField()
+       let tf = FocusableTextField(.init(
+        condition: { [weak self] in
+            self?.generalAddress.textField.text?.isEmpty ?? true
+        },
+        focusAction: { [weak self] in
+            print("focusedAction generalAddress")
+            self?.generalAddress.textField.becomeFirstResponder()
+        }
+    ))
         tf.delegate = self
         tf.backgroundColor = .orange
         tf.returnKeyType = .next
         return tf
     }()
     
-    lazy var detailAddress: FocusableTextField = {
-       let tf = FocusableTextField()
-        tf.delegate = self
-        tf.backgroundColor = .blue
-        tf.returnKeyType = .next
-        return tf
-    }()
+    lazy var childView = TransactionChildView()
     
     init() {
         super.init(frame: .zero)
         setupUI()
+        
+        childView.delegate = self
     }
     
     private func setupUI() {
-        let sv = UIStackView(arrangedSubviews: [titleLabel, generalAddress, detailAddress])
+        let sv = UIStackView(arrangedSubviews: [titleLabel, generalAddress, childView])
         sv.axis = .vertical
         sv.alignment = .fill
         sv.distribution = .fill

@@ -12,24 +12,18 @@ protocol NameSectionDelegate: AnyObject {
 }
 
 final class NameSection: UIView,
-                         FocusableTextFieldDelegate,
-                         Focusable {
-    
-    var focusableTarget: UITextField? { nil }
+                         FocusableTextFieldDelegate, Focusable {
     
     weak var delegate: NameSectionDelegate?
+    
+    var focusableSection: UIView? { self }
     
     func didTapReturn() -> Bool {
         delegate?.didTapReturn() ?? false
     }
     
-    var isFocusedField: Bool = false
-    
-    lazy var children: [any Focusable] = [lastName, firstName]
-    
     func textFieldDidChange(_ textField: UITextField) {
-        print(lastName.isFocusedField)
-        print(firstName.isFocusedField)
+        
     }
     
     private lazy var titleLabel: UILabel = {
@@ -41,7 +35,15 @@ final class NameSection: UIView,
     }()
     
     private lazy var lastName: FocusableTextField = {
-       let tf = FocusableTextField()
+       let tf = FocusableTextField(.init(
+        condition: { [weak self] in
+            self?.lastName.textField.text?.isEmpty ?? true
+        },
+        focusAction: {[weak self] in
+            print("focusedAction lastName")
+            self?.lastName.textField.becomeFirstResponder()
+        }
+    ))
         tf.widthAnchor.constraint(equalToConstant: 200).isActive = true
 //        tf.heightAnchor.constraint(equalToConstant: 50).isActive = true
         tf.backgroundColor = .orange
@@ -51,7 +53,15 @@ final class NameSection: UIView,
     }()
     
     private lazy var firstName: FocusableTextField = {
-       let tf = FocusableTextField()
+       let tf = FocusableTextField(.init(
+        condition: { [weak self] in
+            self?.firstName.textField.text?.isEmpty ?? true
+        },
+        focusAction: {[weak self] in
+            print("focusedAction firstName")
+            self?.firstName.textField.becomeFirstResponder()
+        }
+    ))
 //        tf.widthAnchor.constraint(equalToConstant: 200).isActive = true
 //        tf.heightAnchor.constraint(equalToConstant: 50).isActive = true
         tf.backgroundColor = .blue
