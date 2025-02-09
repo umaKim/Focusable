@@ -8,121 +8,17 @@
 import Foundation
 import UIKit
 
-//enum FocusCondtionTypes {
-//    case `default`
-//    case skipFilledOne
-//    case custom((any Focusable) -> Bool)
-//}
-//
-//final class FocusWrapper2 {
-//    private var condtion: FocusCondtionTypes = .default
-//    private let focusTree = FocusTree2()
-//    
-//    @discardableResult
-//    func setFocusableNodes(_ nodes: any Focusable...) -> Self {
-//        focusTree.setFocusableNodes(nodes)
-//        return self
-//    }
-//    
-//    @discardableResult
-//    func setNextCondtion(_ condition: FocusCondtionTypes) -> Self {
-//        self.condtion = condition
-//        return self
-//    }
-//    
-//    func build(with views: () -> [UIView]) -> [UIView] {
-//        let views = views()
-//        focusTree.setFocusableNodes(views)
-//        return views
-//    }
-//    
-//    @discardableResult
-//    func setNextCondtion(_ customCondition: @escaping (any Focusable) -> Bool) -> Self {
-//        self.condtion = .custom(customCondition)
-//        return self
-//    }
-//    
-//    func didTapNext(completion: ((_ oldFocusable: any Focusable, _ newFocusable: any Focusable) -> Void)? = nil) {
-//        guard
-//            let currentIndex = focusTree.nodes
-//                .compactMap({ $0.focusableTarget })
-//                .firstIndex(where: { $0.isFirstResponder })
-//                .flatMap({$0})
-//        else { return }
-//        
-//        switch condtion {
-//        case .default:
-//            let nextNode = focusTree.nodes[currentIndex + 1]
-//            nextNode.becomeFirstResponder
-//            completion?(focusTree.nodes[currentIndex], nextNode)
-//            
-//        case .skipFilledOne:
-//            let nodes = focusTree.nodes
-//            if currentIndex < nodes.count - 1 {
-//                for index in (currentIndex + 1)..<nodes.count {
-//                    let nextNode = nodes[index]
-//                    if nextNode.isFocusableTextEmpty {
-//                        nextNode.becomeFirstResponder
-//                        completion?(nodes[currentIndex], nextNode)
-//                        return 
-//                    }
-//                }
-//            }
-//            
-//        case .custom(_):
-//            break
-//        }
-//    }
-//}
-
-enum LastFocusableReturnType {
-    case backToFirstFocusable
-    case backTo
-}
-
 protocol FocusWrappable {
     func focusedByUserInteraction(_ focusable: any Focusable)
 }
 
 final class FocusWrapper: UIView {
-    
     private var currentNode: (any Focusable)? = nil
-    
-//    func build(with views: () -> [UIView]) -> UIView {
-//        self.views = views()
-//        
-//        
-//        let sv = UIStackView(
-//            arrangedSubviews: self.views
-//        )
-//        sv.axis = .vertical
-//        sv.alignment = .fill
-//        sv.distribution = .fill
-//        sv.spacing = 6
-//        
-//        [sv].forEach {
-//            $0.translatesAutoresizingMaskIntoConstraints = false
-//            addSubview($0)
-//        }
-//        
-//        NSLayoutConstraint.activate([
-//            sv.centerXAnchor.constraint(equalTo: centerXAnchor),
-//            sv.centerYAnchor.constraint(equalTo: centerYAnchor),
-//        ])
-//        
-////        self.views.forEach { view in
-////            view.
-////            addSubview(view)
-////        }
-//        
-//        self.views.forEach { view in
-//            if let fw = view.superview as? FocusWrapper {
-//                print("superview is FocusWrapper")
-//            }
-//        }
-//        return self
-//    }
-    
+    private var nodes: [any Focusable] = []
+    private var scrollView: UIScrollView?
+}
+
+extension FocusWrapper {
     func build(with views: () -> [UIView]) -> UIView {
         let views = views()
         
@@ -143,16 +39,6 @@ final class FocusWrapper: UIView {
         
         return self
     }
-    
-    func set(_ view: UIView) {
-        addSubview(view)
-    }
-    
-//    private var views: [UIView] = []
-    
-    private var nodes: [any Focusable] = []
-    
-    private var scrollView: UIScrollView?
 }
 
 extension FocusWrapper {
@@ -167,7 +53,47 @@ extension FocusWrapper {
         currentNode = setCurrentNode(nodes)
         focusAndScroll(to: currentNode)
     }
-    
+}
+
+extension FocusWrapper {
+    private func collectFocusableTargets(
+        from view: UIView,
+        nodes: inout [any Focusable]
+    ) {
+        for subview in view.subviews {
+            if let focusable = subview as? (any Focusable), focusable.focusableSection == nil {
+                nodes.append(focusable)
+            } else {
+                collectFocusableTargets(from: subview, nodes: &nodes)
+            }
+        }
+    }
+}
+
+extension FocusWrapper {
+    private func setCurrentNode(
+        _ nodes: [any Focusable]
+    ) -> (any Focusable)? {
+        guard let index = nodes.firstIndex(
+            where: { $0 === currentNode }
+        )
+        else {
+            return nodes.first
+        }
+        let nextIndex = index + 1
+        if nodes.count <= nextIndex {
+            return nil
+        }
+        for newIndex in nextIndex...nodes.count {
+            if nodes[newIndex].focusableCondition() {
+                return nodes[newIndex]
+            }
+        }
+        return nil
+    }
+}
+
+extension FocusWrapper {
     private func focusAndScroll(to currentNode: (any Focusable)?) {
         if let currentNode {
             focus(on: currentNode)
@@ -180,12 +106,6 @@ extension FocusWrapper {
             currentNode.focusAction()
             
             if let focusableSection = findFocusableSection(of: currentNode) {
-                
-                print("setContentOffset \(focusableSection.frame.origin)")
-                
-                print("setContentOffset \(focusableSection.frame.width)")
-                print("setContentOffset \(focusableSection.frame)")
-                print("setContentOffset \(focusableSection.bounds)")
                 scrollView?.setContentOffset(focusableSection.frame.origin, animated: true)
             }
         }
@@ -194,29 +114,12 @@ extension FocusWrapper {
     private func scroll(to currentNode: any Focusable) {
         if currentNode.focusableCondition() {
             if let focusableSection = findFocusableSection(of: currentNode) {
-                
-                print("setContentOffset \(focusableSection.frame.origin)")
-                
-                print("setContentOffset \(focusableSection.frame.width)")
-                print("setContentOffset \(focusableSection.frame)")
-                print("setContentOffset \(focusableSection.bounds)")
                 scrollView?.setContentOffset(focusableSection.frame.origin, animated: true)
             }
         }
     }
-//    private func findFocusableTargetNodes(of view: UIView) -> [Focusable] {
-//        for subview in view.subviews {
-//            if let focusable = subview as? Focusable,
-//               focusable.focusableTarget != nil {
-//                nodes.append(focusable)
-//            } else {
-//                
-//            }
-//        }
-//    }
     
     private func findFocusableSection(of currentNode: UIView) -> UIView? {
-        
         if let superView = currentNode.superview {
             if let focusable = superView as? (any Focusable),
                let _ = focusable.focusableSection {
@@ -226,32 +129,6 @@ extension FocusWrapper {
             }
         }
         return nil
-    }
-    
-    private func collectFocusableTargets(from view: UIView, nodes: inout [any Focusable]) {
-        for subview in view.subviews {
-            if let focusable = subview as? (any Focusable), focusable.focusableSection == nil {
-                nodes.append(focusable)
-            } else {
-                collectFocusableTargets(from: subview, nodes: &nodes)
-            }
-        }
-    }
-    
-    private func setCurrentNode(_ nodes: [any Focusable]) -> (any Focusable)? {
-        guard let index = nodes.firstIndex(
-            where: { $0 === currentNode }
-        )
-        else {
-            return nodes.first
-        }
-        print("index: \(index)")
-        print("next index: \(index + 1)")
-        let newIndex = index + 1
-        if nodes.count <= newIndex {
-            return nil
-        }
-        return nodes[index + 1]
     }
 }
 
@@ -264,25 +141,6 @@ extension FocusWrapper: FocusWrappable {
         focusAndScroll(to: focusable)
     }
 }
-
-// 최종으로 거슬러 올라간 부모가 FocusWrapper이면 FocusWrapper를 return
-// 아니라면 nil을 return
-extension UIView {
-    func findFocusWrapper(_ view: UIView) -> FocusWrappable? {
-        if let focusWrapper = view as? FocusWrappable {
-            return focusWrapper
-        }
-        
-        if let superview = view.superview {
-            if let focusWrapper = superview as? FocusWrappable {
-                return focusWrapper
-            }
-            return findFocusWrapper(superview)
-        }
-        return nil
-    }
-}
-
 
 // 현재 문제
 // 마지막 노드에서 어떤 노드로 가야하는가

@@ -26,10 +26,6 @@ protocol Focusable: AnyObject, UIView, Hashable {
 }
 
 extension Focusable {
-    var focusableTarget: UITextField? {
-        nil
-    }
-    
     var focusableSection: UIView? {
         nil
     }
@@ -41,9 +37,4 @@ extension Focusable {
     var focusAction: (() -> Void) {
         { () }
     }
-}
-
-struct FocusSetter {
-    let condition: (() -> Bool)
-    let focusAction: () -> ()
 }
