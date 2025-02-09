@@ -50,7 +50,7 @@ extension FocusWrapper {
     func didTapNext() {
         nodes.removeAll()
         collectFocusableTargets(from: self, nodes: &nodes)
-        currentNode = setCurrentNode(nodes)
+        currentNode = findNextNode(of: currentNode, from: nodes)
         focusAndScroll(to: currentNode)
     }
 }
@@ -61,7 +61,8 @@ extension FocusWrapper {
         nodes: inout [any Focusable]
     ) {
         for subview in view.subviews {
-            if let focusable = subview as? (any Focusable), focusable.focusableSection == nil {
+            if let focusable = subview as? (any Focusable),
+               focusable.focusableSection == nil {
                 nodes.append(focusable)
             } else {
                 collectFocusableTargets(from: subview, nodes: &nodes)
@@ -71,25 +72,54 @@ extension FocusWrapper {
 }
 
 extension FocusWrapper {
-    private func setCurrentNode(
-        _ nodes: [any Focusable]
+    private func findNextNode(
+        of currentNode: (any Focusable)?,
+        from nodes: [any Focusable]
     ) -> (any Focusable)? {
-        guard let index = nodes.firstIndex(
-            where: { $0 === currentNode }
-        )
-        else {
-            return nodes.first
-        }
-        let nextIndex = index + 1
-        if nodes.count <= nextIndex {
+        
+        func findNextNode(
+            from nodes: [any Focusable],
+            beginIndex: Int,
+            lastIndex: Int
+        ) -> (any Focusable)? {
+            if beginIndex > lastIndex { return nil }
+            for newIndex in beginIndex...lastIndex {
+                if nodes[newIndex].focusableCondition() {
+                    return nodes[newIndex]
+                }
+            }
             return nil
         }
-        for newIndex in nextIndex...nodes.count {
-            if nodes[newIndex].focusableCondition() {
-                return nodes[newIndex]
-            }
+        
+        guard let currentNode else { return nil }
+        guard
+            let currentIndex = nodes.firstIndex(
+                where: { $0 === currentNode }
+            ),
+            let lastIndex = nodes.lastIndex(
+                where: { $0 === nodes.last }
+            )
+        else { return currentNode }
+        
+        let nextIndex = currentIndex + 1
+        
+        if let newNode = findNextNode(
+            from: nodes,
+            beginIndex: nextIndex,
+            lastIndex: lastIndex
+        ) {
+            return newNode
         }
-        return nil
+        
+        if let newNode = findNextNode(
+            from: nodes,
+            beginIndex: 0,
+            lastIndex: nextIndex
+        ) {
+            return newNode
+        }
+        
+        return currentNode
     }
 }
 
@@ -141,6 +171,3 @@ extension FocusWrapper: FocusWrappable {
         focusAndScroll(to: focusable)
     }
 }
-
-// 현재 문제
-// 마지막 노드에서 어떤 노드로 가야하는가
