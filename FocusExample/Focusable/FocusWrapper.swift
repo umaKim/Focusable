@@ -5,7 +5,6 @@
 //  Created by 김윤석 on 1/29/25.
 //
 
-import Foundation
 import UIKit
 
 protocol FocusWrappable {
@@ -26,7 +25,6 @@ extension FocusWrapper {
         stackView.axis = .vertical
         stackView.alignment = .fill
         stackView.distribution = .fill
-        stackView.spacing = 6
         
         stackView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(stackView)
@@ -42,11 +40,6 @@ extension FocusWrapper {
 }
 
 extension FocusWrapper {
-    // currentNode에서 다음 node를 찾아주면 된다.
-    // 이때
-    // Focusable들중에 focusableTarget이 nil이 아닌것들을 차례대로 가지면 된다.
-    // 그것들을 Array로 모은다
-    // 그 Array를 순회하면서 focus가 되어 있는 애를 찾는다.
     func didTapNext() {
         nodes.removeAll()
         collectFocusableTargets(from: self, nodes: &nodes)
@@ -127,24 +120,24 @@ extension FocusWrapper {
     private func focusAndScroll(to currentNode: (any Focusable)?) {
         if let currentNode {
             focus(on: currentNode)
-            scroll(to: currentNode)
+            scroll(to: currentNode, with: scrollView)
         }
     }
     
     private func focus(on currentNode: any Focusable) {
         if currentNode.focusableCondition() {
             currentNode.focusAction()
-            
-            if let focusableSection = findFocusableSection(of: currentNode) {
-                scrollView?.setContentOffset(focusableSection.frame.origin, animated: true)
-            }
         }
     }
     
-    private func scroll(to currentNode: any Focusable) {
+    private func scroll(
+        to currentNode: any Focusable,
+        with scrollview: UIScrollView?
+    ) {
+        guard let scrollview else { return }
         if currentNode.focusableCondition() {
             if let focusableSection = findFocusableSection(of: currentNode) {
-                scrollView?.setContentOffset(focusableSection.frame.origin, animated: true)
+                scrollview.setContentOffset(focusableSection.frame.origin, animated: true)
             }
         }
     }
@@ -162,9 +155,6 @@ extension FocusWrapper {
     }
 }
 
-// user와 interact되어 Focus된 Focusable이
-// 자신이 currentNode라는것을
-// Focuswrapper에 알려줘야한다.
 extension FocusWrapper: FocusWrappable {
     func focusedByUserInteraction(_ focusable: any Focusable) {
         currentNode = focusable

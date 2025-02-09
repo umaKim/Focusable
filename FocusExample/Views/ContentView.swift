@@ -37,44 +37,43 @@ final class ContentView: UIView, NameSectionDelegate, AddressSectionDelegate, Te
 
 //MARK: - Set up UI
 extension ContentView {
-//    private func setupUI() {
-//        nameSection.delegate = self
-//        addressSection.delegate = self
-//        transactionSection.delegate = self
-//        
-//        let view = focusWrapper
-////                .setNextCondtion(.skipFilledOne)
-//            .build {
-//                [nameSection,
-//                 addressSection,
-//                 transactionSection]
-//            }
-//        addSubview(view)
-//        view.frame = self.bounds
-//        
-//        
-////        focusWrapper.set(self)
-//    }
-    
     private func setupUI() {
-            nameSection.delegate = self
-            addressSection.delegate = self
-            transactionSection.delegate = self
-            
-            let view = focusWrapper.build {
-                [nameSection,
-                 addressSection,
-                 transactionSection]
-            }
-            
-            addSubview(view)
-            
-            view.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint.activate([
-                view.topAnchor.constraint(equalTo: topAnchor),
-                view.leadingAnchor.constraint(equalTo: leadingAnchor),
-                view.trailingAnchor.constraint(equalTo: trailingAnchor),
-                view.bottomAnchor.constraint(equalTo: bottomAnchor)
-            ])
+        nameSection.delegate = self
+        addressSection.delegate = self
+        transactionSection.delegate = self
+        
+        let stackView = UIStackView(arrangedSubviews: [
+            nameSection,
+            addressSection,
+            transactionSection
+        ])
+        stackView.axis = .vertical
+        stackView.alignment = .fill
+        stackView.distribution = .fill
+        stackView.spacing = 6
+        
+        let stackView2 = UIStackView(arrangedSubviews: [
+            nameSection,
+            addressSection,
+            transactionSection
+        ])
+        stackView2.axis = .vertical
+        stackView2.alignment = .fill
+        stackView2.distribution = .fill
+        stackView2.spacing = 6
+        
+        let view = focusWrapper.build {
+            [stackView, stackView2]
         }
+        
+        addSubview(view)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            view.topAnchor.constraint(equalTo: topAnchor),
+            view.leadingAnchor.constraint(equalTo: leadingAnchor),
+            view.trailingAnchor.constraint(equalTo: trailingAnchor),
+            view.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+    }
 }
